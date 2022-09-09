@@ -13,9 +13,7 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 app.use("/houses", houseRouter);
-app.use(pathNotFound);
 app.use(errorHandler);
-
 app.listen(PORT, async () => {
   try {
     await client.connect();
