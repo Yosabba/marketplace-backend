@@ -66,20 +66,6 @@ const create = async (req, res, next) => {
 };
 
 const read = async (req, res, next) => {
-  // try {
-  //   const { houseId } = req.params;
-  //   const house = await client.query("SELECT * FROM houses WHERE id = $1", [
-  //     houseId,
-  //   ]);
-
-  //   res.json(house.rows[0]);
-  // } catch ({ message }) {
-  //   console.error(`Error: ${message}`);
-  //   next({
-  //     status: 500,
-  //     message: `error: ${message}`,
-  //   });
-  // }
   res.json(res.locals.house);
 };
 
