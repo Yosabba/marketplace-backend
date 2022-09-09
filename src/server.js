@@ -16,7 +16,6 @@ app.use("/houses", houseRouter);
 app.use(pathNotFound);
 app.use(errorHandler);
 
-
 app.listen(PORT, async () => {
   try {
     await client.connect();
