@@ -18,6 +18,17 @@ const doesExist = async (req, res, next) => {
   }
 };
 
+const isValid = async (req,res,next) => {
+  const { bedroom, bathroom, price} = req.body
+
+  if(bedroom === null || bedroom === ""){
+    next({
+      status: 500,
+      message: 'please add valid bedroom'
+    })
+  }
+}
+
 const list = async (req, res) => {
   try {
     const allCars = await client.query("SELECT * FROM houses");
@@ -121,6 +132,6 @@ module.exports = {
   list,
   create,
   read: [doesExist, read],
-  update,
+  update: [isValid, update],
   destroy,
 };
