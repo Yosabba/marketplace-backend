@@ -13,6 +13,8 @@
 # production
 /build
 
+/db.js
+
 # misc
 .DS_Store
 *.pem
