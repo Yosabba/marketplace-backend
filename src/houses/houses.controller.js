@@ -1,7 +1,7 @@
 const client = require("../../db");
 const notFound = require("../errors/NotFound");
 
-const doesExist = async (req, res, next) => {
+async function doesExist(req, res, next) {
   const { houseId = null } = req.params;
   const house = await client.query("SELECT * FROM houses WHERE id = $1", [
     houseId,
@@ -13,20 +13,54 @@ const doesExist = async (req, res, next) => {
       message: "House does not exist",
     });
   } else {
-    res.locals.house = house.rows;
+    res.locals.house = house.rows[0];
     next();
   }
-};
+}
 
-const isValid = async (req,res,next) => {
-  const { bedroom, bathroom, price} = req.body
+function isBodyValid(req, res, next) {
+  const {
+    bedroom,
+    bathroom,
+    house_location,
+    furnished,
+    price,
+    offer,
+    _description,
+    parking,
+    _type,
+  } = req.body;
 
-  if(bedroom === null || bedroom === ""){
+  if (
+    bedroom === null ||
+    bathroom === null ||
+    house_location === null ||
+    furnished === null ||
+    price === null ||
+    offer === null ||
+    _description === null ||
+    parking === null ||
+    _type === null
+  ) {
     next({
       status: 500,
-      message: 'please add valid bedroom'
-    })
+      message: "Invalid body",
+    });
+   
   }
+
+  res.locals.house = {
+    bedroom,
+    bathroom,
+    house_location,
+    furnished,
+    price,
+    offer,
+    _description,
+    parking,
+    _type,
+  };
+  next();
 }
 
 const list = async (req, res) => {
@@ -50,7 +84,7 @@ const create = async (req, res, next) => {
       _description,
       parking,
       _type,
-    } = req.body;
+    } = req.locals.house;
 
     const newHouse = await client.query(
       "INSERT INTO houses (bedroom, bathroom, house_location, furnished, price, offer, _description, parking, _type) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
@@ -66,12 +100,12 @@ const create = async (req, res, next) => {
         _type,
       ]
     );
-    res.json({ msg: "house added successfully", newHouse: newHouses.rows[0] });
+    res.json({ msg: "house added successfully", newHouse: newHouse.rows[0] });
   } catch ({ message }) {
     console.error(`Error: ${message}`);
     next({
       status: 500,
-      message: `error: ${message}`,
+      message: `error1: ${message}`,
     });
   }
 };
@@ -130,8 +164,8 @@ const update = async (req, res) => {
 
 module.exports = {
   list,
-  create,
+  create: [isBodyValid, create],
   read: [doesExist, read],
-  update: [isValid, update],
+  update: [isBodyValid, update],
   destroy,
 };
