@@ -29,6 +29,7 @@ function isBodyValid(req, res, next) {
     _description,
     parking,
     _type,
+    image_url
   } = req.body;
 
   if (
@@ -40,7 +41,8 @@ function isBodyValid(req, res, next) {
     offer === null ||
     _description === null ||
     parking === null ||
-    _type === null
+    _type === null ||
+    image_url === null
   ) {
     next({
       status: 500,
@@ -49,17 +51,7 @@ function isBodyValid(req, res, next) {
    
   }
 
-  res.locals.house = {
-    bedroom,
-    bathroom,
-    house_location,
-    furnished,
-    price,
-    offer,
-    _description,
-    parking,
-    _type,
-  };
+
   next();
 }
 
@@ -84,10 +76,11 @@ const create = async (req, res, next) => {
       _description,
       parking,
       _type,
-    } = req.locals.house;
+      image_url
+    } = req.body;
 
     const newHouse = await client.query(
-      "INSERT INTO houses (bedroom, bathroom, house_location, furnished, price, offer, _description, parking, _type) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+      "INSERT INTO houses (bedroom, bathroom, house_location, furnished, price, offer, _description, parking, _type, image_url) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
       [
         bedroom,
         bathroom,
@@ -98,6 +91,7 @@ const create = async (req, res, next) => {
         _description,
         parking,
         _type,
+        image_url
       ]
     );
     res.json({ msg: "house added successfully", newHouse: newHouse.rows[0] });
@@ -105,7 +99,7 @@ const create = async (req, res, next) => {
     console.error(`Error: ${message}`);
     next({
       status: 500,
-      message: `error1: ${message}`,
+      message: `error: ${message}`,
     });
   }
 };
@@ -167,5 +161,5 @@ module.exports = {
   create: [isBodyValid, create],
   read: [doesExist, read],
   update: [isBodyValid, update],
-  destroy,
+  destroy: [doesExist, destroy],
 };
