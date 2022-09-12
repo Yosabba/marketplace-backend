@@ -19,6 +19,6 @@ CREATE TABLE users (
     ID SERIAL PRIMARY KEY,
     username VARCHAR(20) NOT NULL,
     _password VARCHAR(20) NOT NULL,
-    email VARCHAR(20) NOT NULL
+    email VARCHAR(200) NOT NULL
 );
 
