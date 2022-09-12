@@ -23,34 +23,26 @@ function isBodyValid(req, res, next) {
     bedroom,
     bathroom,
     house_location,
-    furnished,
     price,
-    offer,
     _description,
-    parking,
     _type,
-    image_url
+    image_url,
   } = req.body;
 
   if (
-    bedroom === null ||
-    bathroom === null ||
-    house_location === null ||
-    furnished === null ||
-    price === null ||
-    offer === null ||
-    _description === null ||
-    parking === null ||
-    _type === null ||
-    image_url === null
+    bedroom === 0 ||
+    bathroom === 0 ||
+    house_location === "" ||
+    price === 0 ||
+    _description === "" ||
+    _type === "" ||
+    image_url === ""
   ) {
     next({
       status: 500,
-      message: "Invalid body",
+      message: "Invalid body value",
     });
-   
   }
-
 
   next();
 }
@@ -76,7 +68,7 @@ const create = async (req, res, next) => {
       _description,
       parking,
       _type,
-      image_url
+      image_url,
     } = req.body;
 
     const newHouse = await client.query(
@@ -91,7 +83,7 @@ const create = async (req, res, next) => {
         _description,
         parking,
         _type,
-        image_url
+        image_url,
       ]
     );
     res.json({ msg: "house added successfully", newHouse: newHouse.rows[0] });
