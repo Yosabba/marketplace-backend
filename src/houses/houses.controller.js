@@ -1,6 +1,8 @@
 const client = require("../../db");
 const notFound = require("../errors/NotFound");
 
+const crypto = require("crypto");
+
 async function doesExist(req, res, next) {
   const { houseId = null } = req.params;
   const house = await client.query("SELECT * FROM houses WHERE id = $1", [
@@ -23,8 +25,11 @@ function isBodyValid(req, res, next) {
     bedroom,
     bathroom,
     house_location,
+    furnished,
     price,
+    offer,
     _description,
+    parking,
     _type,
     image_url,
   } = req.body;
@@ -33,8 +38,11 @@ function isBodyValid(req, res, next) {
     bedroom === 0 ||
     bathroom === 0 ||
     house_location === "" ||
+    furnished === null ||
     price === 0 ||
+    offer === null ||
     _description === "" ||
+    parking === null ||
     _type === "" ||
     image_url === ""
   ) {
@@ -71,8 +79,10 @@ const create = async (req, res, next) => {
       image_url,
     } = req.body;
 
+    const id = crypto.randomUUID();
+
     const newHouse = await client.query(
-      "INSERT INTO houses (bedroom, bathroom, house_location, furnished, price, offer, _description, parking, _type, image_url) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
+      "INSERT INTO houses (bedroom, bathroom, house_location, furnished, price, offer, _description, parking, _type, image_url, listingId) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
       [
         bedroom,
         bathroom,
@@ -84,6 +94,7 @@ const create = async (req, res, next) => {
         parking,
         _type,
         image_url,
+        id,
       ]
     );
     res.json({ msg: "house added successfully", newHouse: newHouse.rows[0] });
@@ -127,8 +138,9 @@ const update = async (req, res) => {
       _type,
     } = req.body;
 
+
     const houseData = await client.query(
-      "UPDATE houses SET bedroom = $1, bathrooms = $2, house_location = $3, furnished = $4, price = $5, offer = $6, _description = $7, parking = $8, _type = $9, WHERE id = $10 ",
+      "UPDATE houses SET bedroom = $1, bathroom = $2, house_location = $3, furnished = $4, price = $5, offer = $6, _description = $7, parking = $8, _type = $9, WHERE id = $10 ",
       [
         bedroom,
         bathroom,
@@ -139,10 +151,10 @@ const update = async (req, res) => {
         _description,
         parking,
         _type,
-        id,
+        houseId,
       ]
     );
-    res.json({ status: 201, message: `House ID:${houseId} was was updated ` });
+    res.status(201).json({ message: `House ID: ${houseId} was was updated ` });
   } catch ({ message }) {
     console.log(`error!! ${message}`);
   }
@@ -152,6 +164,6 @@ module.exports = {
   list,
   create: [isBodyValid, create],
   read: [doesExist, read],
-  update: [isBodyValid, update],
+  update: [doesExist, isBodyValid, update],
   destroy: [doesExist, destroy],
 };
