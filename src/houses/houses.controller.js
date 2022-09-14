@@ -55,10 +55,23 @@ function isBodyValid(req, res, next) {
   next();
 }
 
+function isBodyUpdateDataValid(req, res, next) {
+  const { bedroom, bathroom, price } = req.body;
+
+  if (bedroom === 0 || bathroom === 0 || price === 0) {
+    next({
+      status: 500,
+      message: "Value cannot be 0",
+    });
+  }
+
+  next();
+}
+
 const list = async (req, res) => {
   try {
     const allCars = await client.query("SELECT * FROM houses");
-    res.json(allCars.rows);
+    res.status(201).json(allCars.rows);
   } catch (err) {
     console.error(err.message);
   }
@@ -97,7 +110,9 @@ const create = async (req, res, next) => {
         id,
       ]
     );
-    res.json({ msg: "house added successfully", newHouse: newHouse.rows[0] });
+    res
+      .status(201)
+      .json({ msg: "house added successfully", newHouse: newHouse.rows[0] });
   } catch ({ message }) {
     console.error(`Error: ${message}`);
     next({
@@ -117,7 +132,7 @@ const destroy = async (req, res) => {
     const house = await client.query("DELETE FROM houses WHERE id = $1", [
       houseId,
     ]);
-    res.json({ message: `House ID:${houseId} was was deleted ` });
+    res.status(201).json({ message: `House ID:${houseId} was was deleted ` });
   } catch ({ message }) {
     console.log(`error!! ${message}`);
   }
@@ -137,7 +152,6 @@ const update = async (req, res) => {
       parking,
       _type,
     } = req.body;
-
 
     const houseData = await client.query(
       "UPDATE houses SET bedroom = $1, bathroom = $2, house_location = $3, furnished = $4, price = $5, offer = $6, _description = $7, parking = $8, _type = $9, WHERE id = $10 ",
@@ -164,6 +178,6 @@ module.exports = {
   list,
   create: [isBodyValid, create],
   read: [doesExist, read],
-  update: [doesExist, isBodyValid, update],
+  update: [doesExist, isBodyUpdateDataValid, update],
   destroy: [doesExist, destroy],
 };
