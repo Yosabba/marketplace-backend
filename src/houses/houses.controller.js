@@ -55,13 +55,42 @@ function isBodyValid(req, res, next) {
   next();
 }
 
-function isBodyUpdateDataValid(req, res, next) {
-  const { bedroom, bathroom, price } = req.body;
+function isUpdateDataValid(req, res, next) {
+  const {
+    bedroom = res.locals.house.bedroom,
+    bathroom = res.locals.house.bathroom,
+    house_location = res.locals.house.house_location,
+    furnished = res.locals.house.furnished,
+    price = res.locals.house.price,
+    offer = res.locals.house.offer,
+    _description = res.locals.house._description,
+    parking = res.locals.house.parking,
+    _type = res.locals.house._type,
+  } = req.body;
 
-  if (bedroom === 0 || bathroom === 0 || price === 0) {
+  if (house_location === "" || _description === "" || _type === "") {
     next({
       status: 500,
-      message: "Value cannot be 0",
+      message:
+        "Invalid value type. location, description and type cannot be empty",
+    });
+  } else if (bedroom === 0 || bathroom === 0 || price === 0) {
+    next({
+      status: 500,
+      message: "Invalid value type. bedroom, bathroom and price cannot be 0",
+    });
+  }
+
+  // check if value is a boolean
+  if (
+    typeof furnished !== "boolean" ||
+    typeof offer !== "boolean" ||
+    typeof parking !== "boolean"
+  ) {
+    next({
+      status: 500,
+      message:
+        "Invalid value type. furnished, offer and parking must be boolean",
     });
   }
 
@@ -71,7 +100,7 @@ function isBodyUpdateDataValid(req, res, next) {
 const list = async (req, res) => {
   try {
     const allCars = await client.query("SELECT * FROM houses");
-    res.status(201).json(allCars.rows);
+    res.status(201).json({ data: allCars.rows });
   } catch (err) {
     console.error(err.message);
   }
@@ -123,7 +152,7 @@ const create = async (req, res, next) => {
 };
 
 const read = async (req, res, next) => {
-  res.json(res.locals.house);
+  res.json({ data: res.locals.house });
 };
 
 const destroy = async (req, res) => {
@@ -141,20 +170,22 @@ const destroy = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { houseId } = req.params;
+
     const {
-      bedroom,
-      bathroom,
-      house_location,
-      furnished,
-      price,
-      offer,
-      _description,
-      parking,
-      _type,
+      bedroom = res.locals.house.bedroom,
+      bathroom = res.locals.house.bathroom,
+      house_location = res.locals.house.house_location,
+      furnished = res.locals.house.furnished,
+      price = res.locals.house.price,
+      offer = res.locals.house.offer,
+      _description = res.locals.house._description,
+      parking = res.locals.house.parking,
+      _type = res.locals.house._type,
+      image_url = res.locals.house.image_url,
     } = req.body;
 
     const houseData = await client.query(
-      "UPDATE houses SET bedroom = $1, bathroom = $2, house_location = $3, furnished = $4, price = $5, offer = $6, _description = $7, parking = $8, _type = $9, WHERE id = $10 ",
+      "UPDATE houses SET bedroom = $1, bathroom = $2, house_location = $3, furnished = $4, price = $5, offer = $6, _description = $7, parking = $8, _type = $9, image_url = $10 WHERE id = $11 ",
       [
         bedroom,
         bathroom,
@@ -165,9 +196,11 @@ const update = async (req, res) => {
         _description,
         parking,
         _type,
+        image_url,
         houseId,
       ]
     );
+
     res.status(201).json({ message: `House ID: ${houseId} was was updated ` });
   } catch ({ message }) {
     console.log(`error!! ${message}`);
@@ -178,6 +211,6 @@ module.exports = {
   list,
   create: [isBodyValid, create],
   read: [doesExist, read],
-  update: [doesExist, isBodyUpdateDataValid, update],
+  update: [doesExist, isUpdateDataValid, update],
   destroy: [doesExist, destroy],
 };
