@@ -100,7 +100,18 @@ function isUpdateDataValid(req, res, next) {
 const list = async (req, res) => {
   try {
     const allCars = await client.query("SELECT * FROM houses");
-    res.status(201).json({ data: allCars.rows });
+    res.status(201).json(allCars.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+};
+
+const getAllHousesForRent = async (req, res) => {
+  try {
+    const allHouses = await client.query(
+      "SELECT * FROM houses WHERE offer = true"
+    );
+    res.status(201).json(allHouses.rows);
   } catch (err) {
     console.error(err.message);
   }
@@ -152,7 +163,7 @@ const create = async (req, res, next) => {
 };
 
 const read = async (req, res, next) => {
-  res.json({ data: res.locals.house });
+  res.json(res.locals.house);
 };
 
 const destroy = async (req, res) => {
