@@ -28,9 +28,9 @@ function isBodyValid(req, res, next) {
     furnished,
     price,
     offer,
-    _description,
+    description,
     parking,
-    _type,
+    type,
     image_url,
   } = req.body;
 
@@ -41,9 +41,9 @@ function isBodyValid(req, res, next) {
     furnished === null ||
     price === 0 ||
     offer === null ||
-    _description === "" ||
+    description === "" ||
     parking === null ||
-    _type === "" ||
+    type === "" ||
     image_url === ""
   ) {
     next({
@@ -63,12 +63,12 @@ function isUpdateDataValid(req, res, next) {
     furnished = res.locals.house.furnished,
     price = res.locals.house.price,
     offer = res.locals.house.offer,
-    _description = res.locals.house._description,
+    description = res.locals.house.description,
     parking = res.locals.house.parking,
-    _type = res.locals.house._type,
+    type = res.locals.house.type,
   } = req.body;
 
-  if (house_location === "" || _description === "" || _type === "") {
+  if (house_location === "" || description === "" || type === "") {
     next({
       status: 500,
       message:
@@ -126,16 +126,16 @@ const create = async (req, res, next) => {
       furnished,
       price,
       offer,
-      _description,
+      description,
       parking,
-      _type,
+      type,
       image_url,
     } = req.body;
 
     const id = crypto.randomUUID();
 
     const newHouse = await client.query(
-      "INSERT INTO houses (bedroom, bathroom, house_location, furnished, price, offer, _description, parking, _type, image_url, listingId) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
+      "INSERT INTO houses (bedroom, bathroom, house_location, furnished, price, offer, description, parking, type, image_url, listingId) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
       [
         bedroom,
         bathroom,
@@ -143,9 +143,9 @@ const create = async (req, res, next) => {
         furnished,
         price,
         offer,
-        _description,
+        description,
         parking,
-        _type,
+        type,
         image_url,
         id,
       ]
@@ -189,9 +189,9 @@ const update = async (req, res) => {
       furnished = res.locals.house.furnished,
       price = res.locals.house.price,
       offer = res.locals.house.offer,
-      _description = res.locals.house._description,
+      description = res.locals.house._description,
       parking = res.locals.house.parking,
-      _type = res.locals.house._type,
+      type = res.locals.house._type,
       image_url = res.locals.house.image_url,
     } = req.body;
 
@@ -204,9 +204,9 @@ const update = async (req, res) => {
         furnished,
         price,
         offer,
-        _description,
+        description,
         parking,
-        _type,
+        type,
         image_url,
         houseId,
       ]
