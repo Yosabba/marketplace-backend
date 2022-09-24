@@ -6,7 +6,7 @@ function isUsernameValid(req, res, next) {
   const { username } = req.body;
 
   if (username === "" || username === null) {
-    next({
+    return next({
       status: 500,
       message: "username cannot be empty",
     });
@@ -19,18 +19,20 @@ function isEmailValid(req, res, next) {
   const { email } = req.body;
 
   if (email === "" || email === null) {
-    next({
+    return next({
       status: 500,
       message: "email cannot be empty",
     });
   }
+
+  next();
 }
 
 function isPasswordValid(req, res, next) {
   const { password } = req.body;
 
   if (password === "" || password === null) {
-    next({
+   return next({
       status: 500,
       message: "password cannot be empty",
     });
@@ -47,10 +49,7 @@ async function encryptPassword(req, res, next) {
     res.locals.password = hashedPassword;
     next();
   } catch ({ message }) {
-    next({
-      status: 500,
-      message: "error occurred fetching bcrypt",
-    });
+    console.log(message)
   }
 }
 
@@ -60,22 +59,32 @@ const create = async (req, res) => {
     const { password } = res.locals;
 
     const { rows } = await client.query(
-      "INSERT INTO users (username, password, email) VALUES($1, $2, $3)",
+      "INSERT INTO users (username, password, email) VALUES($1, $2, $3) RETURNING *",
       [username, password, email]
     );
+
+    res.status(201).json({ message: "added new user" });
   } catch ({ message }) {
     console.log(message);
   }
+};
 
-  res.status(200).send();
+const list = async (req, res) => {
+  try {
+    const { rows } = await client.query("SELECT * FROM users");
+    res.status(201).json(rows);
+  } catch (err) {
+    console.error(err.message);
+  }
 };
 
 module.exports = {
-  signUp: [
+  signup: [
     isUsernameValid,
     isPasswordValid,
     isEmailValid,
     encryptPassword,
     create,
   ],
+  list,
 };

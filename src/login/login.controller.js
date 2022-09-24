@@ -6,7 +6,7 @@ function isUsernameValid(req, res, next) {
   const { username } = req.body;
 
   if (username === "") {
-    next({
+    return next({
       status: 500,
       message: "Username cannot be empty",
     });
@@ -18,7 +18,7 @@ function isPasswordValid(req, res, next) {
   const { password } = req.body;
 
   if (password === "") {
-    next({
+    return next({
       status: 500,
       message: "Password cannot be empty",
     });
@@ -36,7 +36,7 @@ async function login(req, res, next) {
     );
 
     if (rows.length <= 0) {
-      next({
+      return next({
         status: 500,
         message: "user does not exists",
       });
@@ -46,26 +46,17 @@ async function login(req, res, next) {
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      next({
+      return next({
         status: 500,
         message: "Invalid email or password",
       });
     }
 
-    res.status(200).send();
+    res.status(200).send("logged in");
   } catch ({ message }) {
-    console.log(message)
+    console.log(message);
   }
 }
-
-const create = (req, res) => {
-  const { username } = req.body;
-  const { password } = res.locals;
-
-  console.log({ username, password });
-
-  res.status(200).send();
-};
 
 module.exports = {
   login: [isUsernameValid, isPasswordValid, login],
