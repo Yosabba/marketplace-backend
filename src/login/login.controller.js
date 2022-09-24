@@ -8,10 +8,9 @@ function isUsernameValid(req, res, next) {
   if (username === "") {
     next({
       status: 500,
-      message: "Invalid body value",
+      message: "Username cannot be empty",
     });
   }
-
   next();
 }
 
@@ -21,29 +20,43 @@ function isPasswordValid(req, res, next) {
   if (password === "") {
     next({
       status: 500,
-      message: "Invalid body value",
+      message: "Password cannot be empty",
     });
   }
-  res.locals.password = password;
   next();
 }
 
-async function encryptPassword(req, res, next) {
+async function login(req, res, next) {
   try {
-    const { password } = res.locals;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const { username, password } = req.body;
 
-    res.locals.password = hashedPassword;
-    next();
+    const { rows } = await client.query(
+      "SELECT username, password FROM users WHERE username = $1 ",
+      [username]
+    );
+
+    if (rows.length <= 0) {
+      next({
+        status: 500,
+        message: "user does not exists",
+      });
+    }
+
+    const user = rows[0];
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      next({
+        status: 500,
+        message: "Invalid email or password",
+      });
+    }
+
+    res.status(200).send();
   } catch ({ message }) {
-    next({
-      status: 500,
-      message: "error occurred fetching bcrypt",
-    });
+    console.log(message)
   }
 }
-
-async function login(req, res, next) {}
 
 const create = (req, res) => {
   const { username } = req.body;
@@ -55,5 +68,5 @@ const create = (req, res) => {
 };
 
 module.exports = {
-  signUp: [isUsernameValid, isPasswordValid, encryptPassword, create],
+  login: [isUsernameValid, isPasswordValid, login],
 };
