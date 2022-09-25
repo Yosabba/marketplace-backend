@@ -1,6 +1,7 @@
 const client = require("../../db");
 const notFound = require("../errors/NotFound");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 function isUsernameValid(req, res, next) {
   const { username } = req.body;
@@ -63,7 +64,12 @@ const create = async (req, res) => {
       [username, password, email]
     );
 
-    res.status(201).json({ message: "added new user" });
+    const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET);
+
+    res.status(200).json({
+      message: "Signed up successfully!",
+      token: `Bearer ${accessToken}`,
+    });
   } catch ({ message }) {
     console.log(message);
   }
