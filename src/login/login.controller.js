@@ -1,6 +1,7 @@
 const client = require("../../db");
 const notFound = require("../errors/NotFound");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 function isUsernameValid(req, res, next) {
   const { username } = req.body;
@@ -52,7 +53,14 @@ async function login(req, res, next) {
       });
     }
 
-    res.status(200).send("logged in");
+    const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET);
+
+    res
+      .status(200)
+      .json({
+        message: "Logged in successfully!",
+        token: `Bearer ${accessToken}`,
+      });
   } catch ({ message }) {
     console.log(message);
   }
