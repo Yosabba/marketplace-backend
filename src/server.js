@@ -8,10 +8,12 @@ const houseRouter = require("./houses/houses.router");
 const loginRouter = require("./login/login.router");
 const signUpRouter = require("./signup/signup.router");
 const errorHandler = require("./errors/errorHandler");
+const cookieParser = require("cookie-parser");
 
 app.use(morgan("dev"));
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/houses", houseRouter);
 app.use("/login", loginRouter);
