@@ -1,6 +1,7 @@
 const client = require("../../db");
 const notFound = require("../errors/NotFound");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 const crypto = require("crypto");
 
@@ -107,6 +108,11 @@ const list = async (req, res) => {
   }
 };
 
+const createCookies = (req, res, next) => {
+  res.cookie("loggedIn", true, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true }); //secure: true
+  next();
+};
+
 const getAllHousesForRent = async (req, res) => {
   try {
     const allHouses = await client.query(
@@ -131,6 +137,7 @@ function verifyAuthToken(req, res, next) {
       return res.sendStatus(403);
     }
     req.user = user;
+
     next();
   });
 }
@@ -237,7 +244,7 @@ const update = async (req, res) => {
 };
 
 module.exports = {
-  list,
+  list: [createCookies, list],
   create: [verifyAuthToken, isBodyValid, create],
   read: [doesExist, read],
   update: [verifyAuthToken, doesExist, isUpdateDataValid, update],
