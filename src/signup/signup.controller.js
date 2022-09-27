@@ -2,6 +2,7 @@ const client = require("../../db");
 const notFound = require("../errors/NotFound");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 function isUsernameValid(req, res, next) {
   const { username } = req.body;
@@ -33,7 +34,7 @@ function isPasswordValid(req, res, next) {
   const { password } = req.body;
 
   if (password === "" || password === null) {
-   return next({
+    return next({
       status: 500,
       message: "password cannot be empty",
     });
@@ -50,7 +51,7 @@ async function encryptPassword(req, res, next) {
     res.locals.password = hashedPassword;
     next();
   } catch ({ message }) {
-    console.log(message)
+    console.log(message);
   }
 }
 
