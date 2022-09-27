@@ -2,6 +2,7 @@ const client = require("../../db");
 const notFound = require("../errors/NotFound");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 function isUsernameValid(req, res, next) {
   const { username } = req.body;
@@ -55,12 +56,15 @@ async function login(req, res, next) {
 
     const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET);
 
-    res
-      .status(200)
-      .json({
-        message: "Logged in successfully!",
-        token: `Bearer ${accessToken}`,
-      });
+    res.cookie("jwt", accessToken, {
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+    }); //secure: true
+
+    res.status(200).json({
+      message: "Logged in successfully!",
+      token: `Bearer ${accessToken}`,
+    });
   } catch ({ message }) {
     console.log(message);
   }
