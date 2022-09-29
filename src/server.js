@@ -14,6 +14,7 @@ app.use(morgan("dev"));
 app.use(
   cors({
     credentials: true,
+    origin: true,
     exposedHeaders: ["set-cookie"],
   })
 );
