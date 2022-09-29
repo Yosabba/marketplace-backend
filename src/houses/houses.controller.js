@@ -108,16 +108,27 @@ const list = async (req, res) => {
   }
 };
 
-const getAllHousesForRent = async (req, res) => {
-  try {
-    const allHouses = await client.query(
-      "SELECT * FROM houses WHERE offer = true"
-    );
-    res.status(201).json(allHouses.rows);
-  } catch (err) {
-    console.error(err.message);
+// const getAllHousesForRent = async (req, res) => {
+//   try {
+//     const allHouses = await client.query(
+//       "SELECT * FROM houses WHERE offer = true"
+//     );
+//     res.status(201).json(allHouses.rows);
+//   } catch (err) {
+//     console.error(err.message);
+//   }
+// };
+
+function getQueryValue(req, res, next) {
+  const { cityState } = req.query;
+  if (cityState) {
+    res.locals.query = cityState;
+    console.log("query is", cityState);
+     return res.json(`${req.originalUrl}`);
   }
-};
+
+  next();
+}
 
 function verifyAuthToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -239,7 +250,7 @@ const update = async (req, res) => {
 };
 
 module.exports = {
-  list,
+  list: [getQueryValue, list],
   create: [verifyAuthToken, isBodyValid, create],
   read: [doesExist, read],
   update: [verifyAuthToken, doesExist, isUpdateDataValid, update],
