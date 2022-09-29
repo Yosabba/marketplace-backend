@@ -12,7 +12,10 @@ const cookieParser = require("cookie-parser");
 
 app.use(morgan("dev"));
 app.use(
-  cors({ origin: true, credentials: true, exposedHeaders: ["set-cookie"] })
+  cors({
+    origin: "https://house-mp.vercel.app/",
+    credentials: true,
+  })
 );
 app.use(express.json());
 app.use(cookieParser());
