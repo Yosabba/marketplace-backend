@@ -61,6 +61,7 @@ async function login(req, res, next) {
       httpOnly: true,
       secure: true,
       sameSite: "None",
+      
     }); //secure: true
 
     res.status(200).json({

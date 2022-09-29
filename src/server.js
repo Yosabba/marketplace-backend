@@ -11,7 +11,9 @@ const errorHandler = require("./errors/errorHandler");
 const cookieParser = require("cookie-parser");
 
 app.use(morgan("dev"));
-app.use(cors({ origin: true, credentials: true }));
+app.use(
+  cors({ origin: true, credentials: true, exposedHeaders: ["set-cookie"] })
+);
 app.use(express.json());
 app.use(cookieParser());
 
