@@ -59,6 +59,7 @@ async function login(req, res, next) {
     res.cookie("jwt", accessToken, {
       maxAge: 1000 * 60 * 60 * 24,
       httpOnly: true,
+      secure: true,
     }); //secure: true
 
     res.status(200).json({
