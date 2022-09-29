@@ -108,11 +108,6 @@ const list = async (req, res) => {
   }
 };
 
-const createCookies = (req, res, next) => {
-  res.cookie("loggedIn", true, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true }); //secure: true
-  next();
-};
-
 const getAllHousesForRent = async (req, res) => {
   try {
     const allHouses = await client.query(
@@ -244,7 +239,7 @@ const update = async (req, res) => {
 };
 
 module.exports = {
-  list: [createCookies, list],
+  list,
   create: [verifyAuthToken, isBodyValid, create],
   read: [doesExist, read],
   update: [verifyAuthToken, doesExist, isUpdateDataValid, update],
