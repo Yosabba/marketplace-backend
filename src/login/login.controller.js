@@ -57,11 +57,10 @@ async function login(req, res, next) {
     const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET);
 
     res.cookie("jwt", accessToken, {
-      maxAge: 1000 * 60 * 60 * 24,
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      
+      maxAge: 1000 * 60 * 60 * 24,
     }); //secure: true
 
     res.status(200).json({
