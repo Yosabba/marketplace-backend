@@ -60,7 +60,6 @@ async function login(req, res, next) {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      domain: "house-mp.vercel.app",
       maxAge: 1000 * 60 * 60 * 24,
     }); //secure: true
 
