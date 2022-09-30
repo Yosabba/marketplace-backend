@@ -14,7 +14,7 @@ app.use(morgan("dev"));
 app.use(
   cors({
     credentials: true,
-    origin: "https://house-mp.vercel.app/",
+    origin: "https://house-mp.vercel.app/login",
   })
 );
 app.use(express.json());
