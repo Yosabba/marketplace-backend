@@ -124,7 +124,7 @@ function getQueryValue(req, res, next) {
   if (cityState) {
     res.locals.query = cityState;
     console.log("query is", cityState);
-     return res.json(`${req.originalUrl}`);
+    return res.json(`${req.originalUrl}`);
   }
 
   next();
@@ -220,14 +220,14 @@ const update = async (req, res) => {
       furnished = res.locals.house.furnished,
       price = res.locals.house.price,
       offer = res.locals.house.offer,
-      description = res.locals.house._description,
+      description = res.locals.house.description,
       parking = res.locals.house.parking,
-      type = res.locals.house._type,
+      type = res.locals.house.type,
       image_url = res.locals.house.image_url,
     } = req.body;
 
     const houseData = await client.query(
-      "UPDATE houses SET bedroom = $1, bathroom = $2, house_location = $3, furnished = $4, price = $5, offer = $6, _description = $7, parking = $8, _type = $9, image_url = $10 WHERE id = $11 ",
+      "UPDATE houses SET bedroom = $1, bathroom = $2, house_location = $3, furnished = $4, price = $5, offer = $6, description = $7, parking = $8, type = $9, image_url = $10 WHERE id = $11 ",
       [
         bedroom,
         bathroom,
