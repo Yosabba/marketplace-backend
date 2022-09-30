@@ -59,7 +59,7 @@ async function login(req, res, next) {
     res.cookie("jwt", accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 1000 * 60 * 60 * 24,
     }); //secure: true
 

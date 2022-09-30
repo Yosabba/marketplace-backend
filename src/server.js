@@ -14,10 +14,11 @@ app.use(morgan("dev"));
 app.use(
   cors({
     credentials: true,
-    origin: "https://house-mp.vercel.app/login",
+    origin: "https://house-mp.vercel.app",
   })
 );
 app.use(express.json());
+app.set("trust proxy", 1);
 app.use(cookieParser());
 
 app.use("/houses", houseRouter);
