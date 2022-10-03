@@ -56,14 +56,15 @@ async function login(req, res, next) {
 
     const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET);
 
-    res.cookie("jwt", accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: 1000 * 60 * 60 * 24,
-    }); //secure: true
+    // res.cookie("jwt", accessToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: "none",
+    //   maxAge: 1000 * 60 * 60 * 24,
+    // }); //secure: true
 
     res.status(200).json({
+      user: user.username,
       message: "Logged in successfully!",
       token: `Bearer ${accessToken}`,
     });
