@@ -15,8 +15,6 @@ app.use(
   cors({
     credentials: true,
     origin: "https://house-mp.vercel.app",
-    AccessControlAllowOrigin: "https://house-mp.vercel.app",
-    AccessControlAllowCredentials: true,
   })
 );
 app.use(express.json());
