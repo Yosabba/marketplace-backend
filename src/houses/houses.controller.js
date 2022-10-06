@@ -250,7 +250,7 @@ const update = async (req, res) => {
 };
 
 module.exports = {
-  list: [getQueryValue, list],
+  list,
   create: [verifyAuthToken, isBodyValid, create],
   read: [doesExist, read],
   update: [verifyAuthToken, doesExist, isUpdateDataValid, update],
