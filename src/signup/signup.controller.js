@@ -4,13 +4,13 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 
-function isUsernameValid(req, res, next) {
-  const { username } = req.body;
+function isNameValid(req, res, next) {
+  const { name } = req.body;
 
-  if (username === "" || username === null) {
+  if (name === "" || name === null) {
     return next({
       status: 500,
-      message: "username cannot be empty",
+      message: "name cannot be empty",
     });
   }
 
@@ -57,17 +57,19 @@ async function encryptPassword(req, res, next) {
 
 const create = async (req, res) => {
   try {
-    const { username, email } = req.body;
+    const { name, email } = req.body;
     const { password } = res.locals;
 
     const { rows } = await client.query(
-      "INSERT INTO users (username, password, email) VALUES($1, $2, $3) RETURNING *",
-      [username, password, email]
+      "INSERT INTO users (name, password, email) VALUES($1, $2, $3) RETURNING *",
+      [name, password, email]
     );
 
     const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET);
 
     res.status(200).json({
+      user: rows[0].name,
+      email: rows[0].email,
       message: "Signed up successfully!",
       token: `Bearer ${accessToken}`,
     });
@@ -86,12 +88,6 @@ const list = async (req, res) => {
 };
 
 module.exports = {
-  signup: [
-    isUsernameValid,
-    isPasswordValid,
-    isEmailValid,
-    encryptPassword,
-    create,
-  ],
+  signup: [isNameValid, isPasswordValid, isEmailValid, encryptPassword, create],
   list,
 };
