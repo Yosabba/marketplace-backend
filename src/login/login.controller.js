@@ -4,17 +4,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 
-function isUsernameValid(req, res, next) {
-  const { username } = req.body;
-
-  if (username === "") {
-    return next({
-      status: 500,
-      message: "Username cannot be empty",
-    });
-  }
-  next();
-}
 
 function isPasswordValid(req, res, next) {
   const { password } = req.body;
@@ -28,13 +17,25 @@ function isPasswordValid(req, res, next) {
   next();
 }
 
+function isEmailValid(req, res, next) {
+  const { email } = req.body;
+
+  if (email === "") {
+    return next({
+      status: 500,
+      message: "email cannot be empty",
+    });
+  }
+  next();
+}
+
 async function login(req, res, next) {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     const { rows } = await client.query(
-      "SELECT username, password FROM users WHERE username = $1 ",
-      [username]
+      "SELECT email,name, password FROM users WHERE email = $1 ",
+      [email]
     );
 
     if (rows.length <= 0) {
@@ -54,7 +55,7 @@ async function login(req, res, next) {
       });
     }
 
-    const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET);
+    const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
 
     // res.cookie("jwt", accessToken, {
     //   httpOnly: true,
@@ -64,7 +65,8 @@ async function login(req, res, next) {
     // }); //secure: true
 
     res.status(200).json({
-      user: user.username,
+      user: user.name,
+      email: user.email,
       message: "Logged in successfully!",
       token: `Bearer ${accessToken}`,
     });
@@ -74,5 +76,5 @@ async function login(req, res, next) {
 }
 
 module.exports = {
-  login: [isUsernameValid, isPasswordValid, login],
+  login: [isEmailValid, isPasswordValid, login],
 };
