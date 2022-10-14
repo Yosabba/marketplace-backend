@@ -102,18 +102,24 @@ function isUpdateDataValid(req, res, next) {
 const list = async (req, res) => {
   try {
     const allCars = await client.query("SELECT * FROM houses");
-    res.status(201).json(allCars.rows);
+    res.status(200).json(allCars.rows);
   } catch (err) {
     console.error(err.message);
   }
 };
 
-function getQueryValue(req, res, next) {
+async function getQueryValue(req, res, next) {
   const { cityState } = req.query;
   if (cityState) {
-    res.locals.query = cityState;
-    console.log("query is", cityState);
-    return res.json(`${req.originalUrl}`);
+    try {
+      const getHouse = await client.query("SELECT * FROM houses");
+      return res.json(getHouse.rows);
+    } catch ({ message }) {
+      return next({
+        status: 500,
+        message,
+      });
+    }
   }
 
   next();
@@ -239,7 +245,7 @@ const update = async (req, res) => {
 };
 
 module.exports = {
-  list,
+  list: [getQueryValue, list],
   create: [verifyAuthToken, isBodyValid, create],
   read: [doesExist, read],
   update: [verifyAuthToken, doesExist, isUpdateDataValid, update],
