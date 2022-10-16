@@ -112,12 +112,19 @@ async function getQueryValue(req, res, next) {
   const { cityState } = req.query;
   if (cityState) {
     try {
-      const getHouse = await client.query("SELECT * FROM houses");
+      // select houses with cityState in the location name
+      const newCityState = cityState.split("");
+
+      const getHouse = await client.query(
+        "SELECT * FROM houses WHERE house_location ILIKE $1",
+        [`${newCityState[0]}%`]
+      );
+
       return res.json(getHouse.rows);
     } catch ({ message }) {
       return next({
         status: 500,
-        message,
+        message: `error: ${message}`,
       });
     }
   }
